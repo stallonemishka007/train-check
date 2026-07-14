@@ -1,8 +1,8 @@
 from app.domain.workout_logic import calculate_status
 from app.domain.progression import get_next_set
 WORKOUTS = {
-    A [
-        {name Жим, sets 3, reps 8-10, weight 10}
+    "A": [
+        {"name": "Жим", "sets": 3, "reps": "8-10", "weight": 10}
     ]
 }
 class WorkoutService
