@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  bot:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: botdb
+    ports:
+      - "5432:5432"
