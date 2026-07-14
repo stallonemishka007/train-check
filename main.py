@@ -12,7 +12,7 @@ async def main():
     pool = await create_pool(settings.DB_URL)
     repo = WorkoutRepository(pool)
     service = WorkoutService(repo)
-dp.include_router(get_router(service))
+    dp.include_router(get_router(service))
     asyncio.create_task(scheduler())
     await dp.start_polling(bot)
 if __name__ == "__main__":
