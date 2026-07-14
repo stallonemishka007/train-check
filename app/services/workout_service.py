@@ -5,7 +5,7 @@ WORKOUTS = {
         {"name": "Жим", "sets": 3, "reps": "8-10", "weight": 10}
     ]
 }
-class WorkoutService
+class WorkoutService:
     def __init__(self, repo)
         self.repo = repo
     async def add_set(self, workout_id, ex_index)
