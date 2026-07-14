@@ -6,14 +6,19 @@ WORKOUTS = {
     ]
 }
 class WorkoutService:
-    def __init__(self, repo)
+    def __init__(self, repo):
         self.repo = repo
-    async def add_set(self, workout_id, ex_index)
+    async def add_set(self, workout_id, ex_index):
         workout = await self.repo.get_workout(workout_id)
-        ex = WORKOUTS[workout[type]][ex_index]
+        ex = WORKOUTS[workout["type"]][ex_index]
         reps, weight = get_next_set(None, ex)
-        await self.repo.insert_set(workout_id, ex[name], reps, weight)
+        await self.repo.insert_set(
+            workout_id,
+            ex["name"],
+            reps,
+            weight
+        )
         done = await self.repo.count_sets(workout_id)
-        total = ex[sets]
+        total = ex["sets"]
         status = calculate_status(done, total)
         return status
