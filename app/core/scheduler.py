@@ -1,5 +1,5 @@
 import asyncio
-async def scheduler()
-    while True
-        # тут будут уведомления и закрытие дня
-        await asyncio.sleep(30)
+async def scheduler():
+    while True:
+        print("Scheduler работает")
+        await asyncio.sleep(60)
