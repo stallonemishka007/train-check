@@ -59,3 +59,25 @@ class WorkoutService:
         return None
     async def finish_workout(self, workout_id):
         await self.repo.finish_workout(workout_id)
+def get_next_type(self, last_type):
+    if last_type == "A":
+        return "B"
+    return "A"
+from datetime import date
+async def get_or_create_today(self):
+    today = date.today()
+    workout = await self.repo.get_today(today)
+    if workout:
+        return workout
+    last = await self.repo.get_last_workout()
+    if last:
+        workout_type = self.get_next_type(last["type"])
+    else:
+        workout_type = "A"
+    workout = await self.repo.create_workout(today, workout_type)
+    templates = await self.repo.get_templates(workout_type)
+    await self.repo.create_workout_exercises(
+        workout["id"],
+        templates
+    )
+    return workout

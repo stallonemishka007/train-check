@@ -116,3 +116,30 @@ def get_router(workout_service):
         await callback.message.answer("Тренировка завершена ✅")
         await callback.answer()
     return router
+@router.message(Command("today"))
+async def today_cmd(message: Message):
+    workout = await workout_service.get_or_create_today()
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text="▶️ Начать тренировку",
+            callback_data=f"ws:start:{workout['id']}"
+        )]
+    ])
+    await message.answer(
+        f"Сегодня\nТренировка {workout['type']}\nСтатус: {workout['status']}",
+        reply_markup=kb
+    )
+@router.callback_query(F.data == "today")
+async def today_cb(callback: CallbackQuery):
+    workout = await workout_service.get_or_create_today()
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text="▶️ Начать тренировку",
+            callback_data=f"ws:start:{workout['id']}"
+        )]
+    ])
+    await callback.message.answer(
+        f"Сегодня\nТренировка {workout['type']}\nСтатус: {workout['status']}",
+        reply_markup=kb
+    )
+    await callback.answer()
