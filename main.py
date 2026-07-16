@@ -10,6 +10,7 @@ from app.services.workout_service import WorkoutService
 from app.bot.handlers.today import get_router as today_router
 from app.bot.handlers.workout import get_router as workout_router
 
+
 async def main():
     # — бот —
     bot = Bot(token=BOT_TOKEN)
@@ -25,5 +26,5 @@ async def main():
     dp.include_router(workout_router(service))
     # --- запуск ---
     await dp.start_polling(bot)
-    if name == "main":
-    asyncio.run(main())
+    if __name__ == "__main__":
+        asyncio.run(main())
