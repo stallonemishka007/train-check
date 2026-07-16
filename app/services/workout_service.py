@@ -1,12 +1,16 @@
 from datetime import date
 
+
 class WorkoutService:
-def init(self, repo):
-self.repo = repo
+    def __init__(self, repo):
+        self.repo = repo
+
 
 # --- чередование A/B ---
 def get_next_type(self, last_type):
     return "B" if last_type == "A" else "A"
+
+
 # --- получить или создать тренировку ---
 async def get_or_create_today(self):
     today = date.today()
@@ -22,6 +26,8 @@ async def get_or_create_today(self):
     templates = await self.repo.get_templates(wtype)
     await self.repo.create_workout_exercises(workout["id"], templates)
     return workout
+
+
 # --- старт тренировки ---
 async def start_workout(self, workout_id):
     await self.repo.start_workout(workout_id)
@@ -32,8 +38,10 @@ async def start_workout(self, workout_id):
         "id": first["id"],
         "name": first["name"],
         "sets": first["planned_sets"],
-        "done": done
+        "done": done,
     }
+
+
 # --- добавить подход ---
 async def add_set(self, ex_id):
     ex = await self.repo.get_exercise(ex_id)
@@ -41,10 +49,9 @@ async def add_set(self, ex_id):
     weight = ex["planned_weight"] or 10
     await self.repo.add_set(ex_id, reps, weight)
     done = await self.repo.count_sets(ex_id)
-    return {
-        "done": done,
-        "total": ex["planned_sets"]
-    }
+    return {"done": done, "total": ex["planned_sets"]}
+
+
 # --- следующее упражнение ---
 async def next_exercise(self, workout_id):
     exercises = await self.repo.get_workout_exercises(workout_id)
@@ -55,9 +62,11 @@ async def next_exercise(self, workout_id):
                 "id": ex["id"],
                 "name": ex["name"],
                 "sets": ex["planned_sets"],
-                "done": done
+                "done": done,
             }
     return None
+
+
 # --- завершение ---
 async def finish_workout(self, workout_id):
     await self.repo.finish_workout(workout_id)

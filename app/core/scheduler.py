@@ -1,4 +1,6 @@
 import asyncio
+
+
 async def scheduler():
     while True:
         print("Scheduler работает")

@@ -1,15 +1,17 @@
 class WorkoutRepository:
-def init(self, pool):
-self.pool = pool
+    def __init__(self, pool):
+        self.pool = pool
+
 
 # --- получить тренировку на сегодня ---
 async def get_today(self, today):
     async with self.pool.acquire() as conn:
         row = await conn.fetchrow(
-            "SELECT * FROM workouts WHERE workout_date = $1",
-            today
+            "SELECT * FROM workouts WHERE workout_date = $1", today
         )
         return dict(row) if row else None
+
+
 # --- последняя тренировка ---
 async def get_last_workout(self):
     async with self.pool.acquire() as conn:
@@ -21,6 +23,8 @@ async def get_last_workout(self):
             """
         )
         return dict(row) if row else None
+
+
 # --- создать тренировку ---
 async def create_workout(self, workout_date, workout_type):
     async with self.pool.acquire() as conn:
@@ -31,9 +35,11 @@ async def create_workout(self, workout_date, workout_type):
             RETURNING *
             """,
             workout_date,
-            workout_type
+            workout_type,
         )
         return dict(row)
+
+
 # --- получить templates ---
 async def get_templates(self, workout_type):
     async with self.pool.acquire() as conn:
@@ -43,9 +49,11 @@ async def get_templates(self, workout_type):
             WHERE workout_type = $1
             ORDER BY order_index
             """,
-            workout_type
+            workout_type,
         )
         return [dict(r) for r in rows]
+
+
 # --- создать упражнения в тренировке ---
 async def create_workout_exercises(self, workout_id, templates):
     async with self.pool.acquire() as conn:
@@ -71,8 +79,10 @@ async def create_workout_exercises(self, workout_id, templates):
                 t["sets"],
                 t["reps_min"],
                 t["reps_max"],
-                t["weight"]
+                t["weight"],
             )
+
+
 # --- получить упражнения тренировки ---
 async def get_workout_exercises(self, workout_id):
     async with self.pool.acquire() as conn:
@@ -82,23 +92,26 @@ async def get_workout_exercises(self, workout_id):
             WHERE workout_id = $1
             ORDER BY order_index
             """,
-            workout_id
+            workout_id,
         )
         return [dict(r) for r in rows]
+
+
 # --- получить одно упражнение ---
 async def get_exercise(self, exercise_id):
     async with self.pool.acquire() as conn:
         row = await conn.fetchrow(
-            "SELECT * FROM workout_exercises WHERE id = $1",
-            exercise_id
+            "SELECT * FROM workout_exercises WHERE id = $1", exercise_id
         )
         return dict(row)
+
+
 # --- добавить подход ---
 async def add_set(self, exercise_id, reps, weight):
     async with self.pool.acquire() as conn:
         count = await conn.fetchval(
             "SELECT COUNT(*) FROM exercise_sets WHERE workout_exercise_id = $1",
-            exercise_id
+            exercise_id,
         )
         await conn.execute(
             """
@@ -108,26 +121,32 @@ async def add_set(self, exercise_id, reps, weight):
             exercise_id,
             count + 1,
             reps,
-            weight
+            weight,
         )
+
+
 # --- посчитать подходы ---
 async def count_sets(self, exercise_id):
     async with self.pool.acquire() as conn:
         return await conn.fetchval(
             "SELECT COUNT(*) FROM exercise_sets WHERE workout_exercise_id = $1",
-            exercise_id
+            exercise_id,
         )
+
+
 # --- старт тренировки ---
 async def start_workout(self, workout_id):
     async with self.pool.acquire() as conn:
         await conn.execute(
             "UPDATE workouts SET status='in_progress', started_at=NOW() WHERE id=$1",
-            workout_id
+            workout_id,
         )
+
+
 # --- завершить тренировку ---
 async def finish_workout(self, workout_id):
     async with self.pool.acquire() as conn:
         await conn.execute(
             "UPDATE workouts SET status='done', completed_at=NOW() WHERE id=$1",
-            workout_id
+            workout_id,
         )
