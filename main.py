@@ -12,7 +12,7 @@ from app.bot.handlers.workout import get_router as workout_router
 
 
 async def main():
-bot = Bot(token=settings.BOT_TOKEN)
+	bot = Bot(token=settings.BOT_TOKEN)
 dp = Dispatcher()
 pool = await create_pool()
 repo = WorkoutRepository(pool)
