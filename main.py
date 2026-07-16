@@ -25,5 +25,5 @@ dp.include_router(today_router(service))
 dp.include_router(workout_router(service))
 # --- запуск ---
 await dp.start_polling(bot)
-if name == “main”:
+if name == "main":
 	asyncio.run(main())
