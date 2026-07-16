@@ -10,15 +10,16 @@ from app.services.workout_service import WorkoutService
 from app.bot.handlers.today import get_router as today_router
 from app.bot.handlers.workout import get_router as workout_router
 
-	async def main():
-	bot = Bot(token=settings.BOT_TOKEN)
-	dp = Dispatcher()
 
-	pool = await create_pool()
-	repo = WorkoutRepository(pool)
-	service = WorkoutService(repo)
-	dp.include_router(today_router(service))
-	dp.include_router(workout_router(service))
-	await dp.start_polling(bot)
-	if name == "main":
-		asyncio.run(main())
+async def main():
+    bot = Bot(token=settings.BOT_TOKEN)
+    dp = Dispatcher()
+
+    pool = await create_pool()
+    repo = WorkoutRepository(pool)
+    service = WorkoutService(repo)
+    dp.include_router(today_router(service))
+    dp.include_router(workout_router(service))
+    await dp.start_polling(bot)
+    if name == "main":
+        asyncio.run(main())
