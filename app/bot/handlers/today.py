@@ -2,7 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
 
-from app.bot.keyboards.inline import today_kb
+from app.keyboards.inline import today_kb
 
 
 def get_router(service):
