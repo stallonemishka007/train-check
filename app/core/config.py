@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings:
-def init(self):
-self.BOT_TOKEN = os.getenv("BOT_TOKEN")
-self.DB_URL = os.getenv("DB_URL")
+	def init(self):
+	self.BOT_TOKEN = os.getenv("BOT_TOKEN")
+	self.DB_URL = os.getenv("DB_URL")
 
 def validate(self):
     if not self.BOT_TOKEN:
