@@ -5,6 +5,9 @@ class WorkoutService:
     def __init__(self, repo):
         self.repo = repo
 
+async def get_today_workout(self, user_id):
+    workout = await self.repo.get_today(user_id)
+    return workout
 
 # --- чередование A/B ---
 def get_next_type(self, last_type):
