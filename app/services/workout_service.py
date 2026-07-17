@@ -7,7 +7,7 @@ class WorkoutService:
 
 async def get_today_workout(self, user_id):
     print("WORKS")
-    return {“id”: 1, "name": "test"}
+    return {"id": 1, "name": "test"}
 
 # --- чередование A/B ---
 def get_next_type(self, last_type):
