@@ -11,11 +11,11 @@ class Settings:
         self.DB_URL = os.getenv("DB_URL")
 
 
-def validate(self):
-    if not self.BOT_TOKEN:
-        raise ValueError("BOT_TOKEN is not set")
-    if not self.DB_URL:
-        raise ValueError("DB_URL is not set")
+    def validate(self):
+        if not self.BOT_TOKEN:
+            raise ValueError("BOT_TOKEN is not set")
+        if not self.DB_URL:
+            raise ValueError("DB_URL is not set")
 
 
 settings = Settings()
