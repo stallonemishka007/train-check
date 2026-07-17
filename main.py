@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 from app.bot.handlers.today import get_router as today_router
 from app.bot.handlers.workout import get_router as workout_router
 from app.core.config import settings
-from app.core.db import create_pool
+from app.core.database import create_pool
 from app.db.repositories.workout_repo import WorkoutRepository
 from app.services.workout_service import WorkoutService
 
