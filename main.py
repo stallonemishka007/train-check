@@ -13,7 +13,7 @@ from app.services.workout_service import WorkoutService
 async def main():
     bot = Bot(token=settings.BOT_TOKEN)
     dp = Dispatcher()
-    pool = await create_pool()
+    pool = await create_pool(settings.DB_URL)
     repo = WorkoutRepository(pool)
     service = WorkoutService(repo)
     dp.include_router(today_router(service))
