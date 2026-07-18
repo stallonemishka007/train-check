@@ -22,6 +22,15 @@ class WorkoutService:
             "done": 1,
             "sets": 4
         }
+    async def next_exercise(self, workout_id: int):
+        return {
+            "id": 2,
+            "name": "Присед",
+            "done": 0,
+            "sets": 3
+        }
+    async def finish_workout(self, workout_id: int):
+       return {"status": "finished"}
 
 # --- чередование A/B ---
 def get_next_type(self, last_type):
