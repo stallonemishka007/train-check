@@ -1,3 +1,6 @@
+import app.services.workout_service as ws
+print("LOADED FROM:", ws.file)
+
 import asyncio
 
 from aiogram import Bot, Dispatcher
