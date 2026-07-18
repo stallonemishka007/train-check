@@ -5,8 +5,8 @@ class WorkoutService:
     def __init__(self, repo):
         self.repo = repo
 
-async def get_today_workout(self, user_id):
-    print("WORKS")
+async def get_today_workout(self, user_id: int):
+    print("UPDATED ✅")
     return {"id": 1, "name": "test"}
 
 # --- чередование A/B ---
