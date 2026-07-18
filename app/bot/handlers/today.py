@@ -7,8 +7,7 @@ from app.keyboards.inline import today_kb
 
 def get_router(service):
     router = Router()
-
-        @router.message(Command("today"))
+    @router.message(Command("today"))
     async def today_cmd(message: Message):
         print("SERVICE MODULE:", service.__class__.__module__)
         workout = await service.get_today_workout(message.from_user.id)
