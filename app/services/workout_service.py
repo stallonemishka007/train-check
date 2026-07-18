@@ -13,21 +13,21 @@ class WorkoutService:
             "id":1,
             "name": "Жим лёжа",
             "done": 0,
-            "sets": 4
+            "total": 4
         }
     async def add_set(self, exercise_id: int):
         return {
             "id": exercise_id,
             "name": "Жим лёжа",
             "done": 1,
-            "sets": 4
+            "total": 4
         }
     async def next_exercise(self, workout_id: int):
         return {
             "id": 2,
             "name": "Присед",
             "done": 0,
-            "sets": 3
+            "total": 3
         }
     async def finish_workout(self, workout_id: int):
        return {"status": "finished"}
@@ -59,11 +59,11 @@ def get_next_type(self, last_type):
         await self.repo.start_workout(workout_id)
         exercises = await self.repo.get_workout_exercises(workout_id)
         first = exercises[0]
-        done = await self.repo.count_sets(first["id"])
+        done = await self.repo.count_total(first["id"])
         return {
             "id": first["id"],
             "name": first["name"],
-            "sets": first["planned_sets"],
+            "total": first["planned_total"],
             "done": done,
         }
 
@@ -74,20 +74,20 @@ def get_next_type(self, last_type):
         reps = ex["reps_min"] or 10
         weight = ex["planned_weight"] or 10
         await self.repo.add_set(ex_id, reps, weight)
-        done = await self.repo.count_sets(ex_id)
-        return {"done": done, "total": ex["planned_sets"]}
+        done = await self.repo.count_total(ex_id)
+        return {"done": done, "total": ex["planned_total"]}
 
 
 # --- следующее упражнение ---
     async def next_exercise(self, workout_id):
         exercises = await self.repo.get_workout_exercises(workout_id)
         for ex in exercises:
-            done = await self.repo.count_sets(ex["id"])
-            if done < ex["planned_sets"]:
+            done = await self.repo.count_total(ex["id"])
+            if done < ex["planned_total"]:
                 return {
                     "id": ex["id"],
                     "name": ex["name"],
-                    "sets": ex["planned_sets"],
+                    "total": ex["planned_total"],
                     "done": done,
                }
         return None
