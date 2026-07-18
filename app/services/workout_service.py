@@ -10,6 +10,7 @@ class WorkoutService:
         return {"status": "started", "workout_id": workout_id}
     async def start_workout(self, workout_id: int):
         return {
+            "id":1,
             "name": "Жим лёжа",
             "done": 0,
             "sets": 4
