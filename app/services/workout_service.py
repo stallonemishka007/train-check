@@ -15,6 +15,13 @@ class WorkoutService:
             "done": 0,
             "sets": 4
         }
+    async def add_set(self, exercise_id: int):
+        return {
+            "id": exercise_id,
+            "name": "Жим лёжа",
+            "done": 1,
+            "sets": 4
+        }
 
 # --- чередование A/B ---
 def get_next_type(self, last_type):
