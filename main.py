@@ -1,5 +1,5 @@
 import app.services.workout_service as ws
-print("LOADED FROM:", ws.file)
+print("LOADED FROM:", ws.__file__)
 
 import asyncio
 
