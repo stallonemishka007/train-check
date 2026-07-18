@@ -6,6 +6,8 @@ class WorkoutService:
 
     async def get_today_workout(self, user_id: int):
         return {"id": 1, "name": "test"}
+    async def start_workout(self, workout_id: int):
+        return {"status": "started", "workout_id": workout_id}
 
 # --- чередование A/B ---
 def get_next_type(self, last_type):
