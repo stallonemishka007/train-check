@@ -4,6 +4,8 @@ from aiogram.types import CallbackQuery, Message
 
 from app.keyboards.inline import today_kb
 
+print("SERVICE CLASS:", type(service))
+print("SERVICE MODULE:", service.__class__.__module__)
 
 def get_router(service):
     router = Router()
