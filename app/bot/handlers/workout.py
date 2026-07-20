@@ -13,7 +13,10 @@ def get_router(service):
     async def start_workout(callback: CallbackQuery):
         _, _, workout_id = callback.data.split(":")
         workout_id = int(workout_id)
-        ex = await service.start_workout(workout_id)
+        ex = await service.start_workout(
+            callback.from_user.id,
+            workout_id
+        )
         await callback.message.answer(
             f"{ex['name']}\n{ex['done']}/{ex['sets']} подходов",
             reply_markup=exercise_kb(ex["id"], workout_id),
@@ -26,7 +29,7 @@ def get_router(service):
     async def add_set(callback: CallbackQuery):
         _, _, ex_id = callback.data.split(":")
         ex_id = int(ex_id)
-        result = await service.add_set(ex_id)
+        result = await service.add_set(callback.from_user.id, ex_id)
         await callback.message.answer(
             f"Подход добавлен ✅\n{result['done']}/{result['total']}"
         )
