@@ -1,41 +1,30 @@
+import re
 from aiogram import Router
-from aiogram.types import CallbackQuery
-from app.keyboards.inline import exercise_kb
-def format_text(ex):
-    return (
-        f"Упражнение {ex['index']}/{ex['total_exercises']}\n"
-        f"{ex['name']}\n"
-        f"{ex['done']}/{ex['sets']} подходов"
-    )
+from aiogram.types import CallbackQuery, Message
+from aiogram.fsm.context import FSMContext
+from app.bot.states.workout import WorkoutState
 def get_router(service):
     router = Router()
-    @router.callback_query(lambda c: c.data.startswith("start:"))
-    async def start_workout(callback: CallbackQuery):
-        workout_id = int(callback.data.split(":")[1])
-        ex = await service.start_workout(
-            callback.from_user.id,
-            workout_id
-        )
-        await callback.message.edit_text(
-            format_text(ex),
-            reply_markup=exercise_kb(ex["id"])
-        )
-        await callback.answer()
-    @router.callback_query(lambda c: c.data.startswith("set:"))
-    async def add_set(callback: CallbackQuery):
-        ex_id = int(callback.data.split(":")[1])
-        result = await service.add_set(
-            callback.from_user.id,
-            ex_id
-        )
+    def fmt(ex):
+        return f"{ex['name']}\n{ex['done']}/{ex['sets']}"
+    @router.callback_query(lambda c: c.data == "start")
+    async def start(callback: CallbackQuery, state: FSMContext):
+        ex = await service.start_workout(callback.from_user.id)
+        await callback.message.edit_text(fmt(ex) + "\n\nВведи 80x8")
+        await state.set_state(WorkoutState.waiting_input)
+    @router.message(WorkoutState.waiting_input)
+    async def input_handler(message: Message, state: FSMContext):
+        text = message.text.lower().replace(" ", "")
+        m = re.match(r"(\d+(\.\d+)?)x(\d+)", text)
+        if not m:
+            await message.answer("Формат: 80x8")
+            return
+        weight = float(m.group(1))
+        reps = int(m.group(3))
+        result = await service.add_set(message.from_user.id, weight, reps)
         if result.get("status") == "finished":
-            await callback.message.edit_text(
-                "Тренировка завершена ✅"
-            )
+            await message.answer("Тренировка завершена ✅")
+            await state.clear()
         else:
-            await callback.message.edit_text(
-                format_text(result),
-                reply_markup=exercise_kb(result["id"])
-            )
-        await callback.answer()
+            await message.answer(fmt(result) + "\n\nСледующий: 80x8")
     return router
