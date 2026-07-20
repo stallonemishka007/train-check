@@ -1,5 +1,3 @@
-from datetime import date
-
 class WorkoutService:
     def __init__(self, repo):
         self.repo = repo
