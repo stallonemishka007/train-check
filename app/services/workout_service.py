@@ -27,7 +27,7 @@ class WorkoutService:
             return self._current_exercise(user_id)
         ex["done"] += 1
         if ex["done"] < ex["sets"]:
-            return ex
+            return self._current_exercise(user_id)
         session["current_exercise"] += 1
         if session["current_exercise"] >= len(session["exercises"]):
             del self.sessions[user_id]
@@ -36,3 +36,15 @@ class WorkoutService:
     def _current_exercise(self, user_id: int):
         session = self.sessions[user_id]
         return session["exercises"][session["current_exercise"]]
+    def _current_exercise(self, user_id: int):
+        session = self.sessions[user_id]
+        idx = session["current_exercise"]
+        ex = session["exercises"][idx]
+        return {
+            "id": ex["id"],
+            "name": ex["name"],
+            "done": ex["done"],
+            "sets": ex["sets"],
+            "index": idx + 1,
+            "total_exercises": len(session["exercises"])
+        }

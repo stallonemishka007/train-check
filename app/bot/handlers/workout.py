@@ -1,6 +1,12 @@
 from aiogram import Router
 from aiogram.types import CallbackQuery
 from app.keyboards.inline import exercise_kb
+def format_text(ex):
+    return (
+        f"Упражнение {ex['index']}/{ex['total_exercises']}\n"
+        f"{ex['name']}\n"
+        f"{ex['done']}/{ex['sets']} подходов"
+    )
 def get_router(service):
     router = Router()
     @router.callback_query(lambda c: c.data.startswith("start:"))
@@ -10,9 +16,9 @@ def get_router(service):
             callback.from_user.id,
             workout_id
         )
-        await callback.message.answer(
-            f"{ex['name']}\n{ex['done']}/{ex['sets']} подходов",
-            reply_markup=exercise_kb(ex["id"], workout_id)
+        await callback.message.edit_text(
+            format_text(ex),
+            reply_markup=exercise_kb(ex["id"])
         )
         await callback.answer()
     @router.callback_query(lambda c: c.data.startswith("set:"))
@@ -23,11 +29,13 @@ def get_router(service):
             ex_id
         )
         if result.get("status") == "finished":
-            await callback.message.answer("Тренировка завершена ✅")
+            await callback.message.edit_text(
+                "Тренировка завершена ✅"
+            )
         else:
-            await callback.message.answer(
-                f"{result['name']}\n{result['done']}/{result['sets']} подходов",
-                reply_markup=exercise_kb(result["id"], 1)
+            await callback.message.edit_text(
+                format_text(result),
+                reply_markup=exercise_kb(result["id"])
             )
         await callback.answer()
     return router
