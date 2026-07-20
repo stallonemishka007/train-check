@@ -3,7 +3,7 @@ from datetime import date
 class WorkoutService:
     def __init__(self, repo):
         self.repo = repo
-        self.sessions = {}  # {user_id: session}
+        self.sessions = {}
     async def get_today_workout(self, user_id: int):
         return {
             "id": 1,
@@ -24,31 +24,17 @@ class WorkoutService:
         session = self.sessions.get(user_id)
         if not session:
             return {"error": "no active workout"}
-        idx = session["current_exercise"]
-        ex = session["exercises"][idx]
-        # защита: проверяем что жмут на текущее упражнение
+        ex = session["exercises"][session["current_exercise"]]
         if ex["id"] != exercise_id:
             return self._current_exercise(user_id)
         ex["done"] += 1
-        # если ещё не закончили подходы
         if ex["done"] < ex["sets"]:
-            return self._format_ex(ex)
-        # если закончили упражнение → следующее
+            return ex
         session["current_exercise"] += 1
-        # если тренировка закончена
         if session["current_exercise"] >= len(session["exercises"]):
             del self.sessions[user_id]
             return {"status": "finished"}
         return self._current_exercise(user_id)
     def _current_exercise(self, user_id: int):
         session = self.sessions[user_id]
-        idx = session["current_exercise"]
-        ex = session["exercises"][idx]
-        return self._format_ex(ex)
-    def _format_ex(self, ex):
-        return {
-            "id": ex["id"],
-            "name": ex["name"],
-            "done": ex["done"],
-            "total": ex["sets"]
-        }
+        return session["exercises"][session["current_exercise"]]
