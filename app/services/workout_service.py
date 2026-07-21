@@ -11,6 +11,7 @@ class WorkoutService:
     async def start_workout(self, user_id: int):
         workout_id = await self.repo.create_workout(user_id)
         plan = await self.get_plan(user_id)
+        print("USER PLAN:", plan)
         if plan == "full":
             exercises = [
                 {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0},
