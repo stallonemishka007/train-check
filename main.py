@@ -13,6 +13,9 @@ async def init_db(pool):
         CREATE TABLE IF NOT EXISTS users (
             id BIGINT PRIMARY KEY
         );
+        await conn.execute("""
+        DROP TABLE IF EXISTS workouts CASCADE;
+        """)
         CREATE TABLE IF NOT EXISTS workouts (
             id SERIAL PRIMARY KEY,
             user_id BIGINT,
