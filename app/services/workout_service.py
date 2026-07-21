@@ -2,6 +2,12 @@ class WorkoutService:
     def __init__(self, repo):
         self.repo = repo
         self.sessions = {}
+    async def ensure_user(self, user_id: int):
+        user = await self.repo.get_user(user_id)
+        if not user:
+            await self.repo.create_user(user_id)
+            return False
+        return True
     async def start_workout(self, user_id: int):
         workout_id = await self.repo.create_workout(user_id)
         exercises = [
@@ -13,13 +19,12 @@ class WorkoutService:
             db_id = await self.repo.add_exercise(workout_id, ex["id"], i)
             db_ids.append(db_id)
         self.sessions[user_id] = {
-            "workout_id": workout_id,
             "current": 0,
             "exercises": exercises,
             "db_ids": db_ids
         }
         return self._current(user_id)
-    async def add_set(self, user_id: int, weight: float, reps: int):
+    async def add_set(self, user_id, weight, reps):
         s = self.sessions[user_id]
         idx = s["current"]
         ex = s["exercises"][idx]
@@ -31,14 +36,12 @@ class WorkoutService:
                 del self.sessions[user_id]
                 return {"status": "finished"}
         return self._current(user_id)
-    def _current(self, user_id: int):
+    def _current(self, user_id):
         s = self.sessions[user_id]
         ex = s["exercises"][s["current"]]
         return {
             "id": ex["id"],
             "name": ex["name"],
             "done": ex["done"],
-            "sets": ex["sets"],
-            "index": s["current"] + 1,
-            "total": len(s["exercises"])
+            "sets": ex["sets"]
         }
