@@ -13,24 +13,25 @@ async def init_db(pool):
         CREATE TABLE IF NOT EXISTS users (
             id BIGINT PRIMARY KEY
         );
-        await conn.execute("""
-        DROP TABLE IF EXISTS workouts CASCADE;
-        """)
+
         CREATE TABLE IF NOT EXISTS workouts (
             id SERIAL PRIMARY KEY,
             user_id BIGINT,
             started_at TIMESTAMP DEFAULT NOW()
         );
+
         CREATE TABLE IF NOT EXISTS exercises (
             id SERIAL PRIMARY KEY,
             name TEXT
         );
+
         CREATE TABLE IF NOT EXISTS workout_exercises (
             id SERIAL PRIMARY KEY,
             workout_id INT,
             exercise_id INT,
             order_index INT
         );
+
         CREATE TABLE IF NOT EXISTS sets (
             id SERIAL PRIMARY KEY,
             workout_exercise_id INT,
@@ -38,6 +39,7 @@ async def init_db(pool):
             reps INT
         );
         """)
+
         # фикс старой схемы
         await conn.execute("""
         ALTER TABLE workouts
