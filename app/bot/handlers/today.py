@@ -1,7 +1,7 @@
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-from app.keyboards.inline import today_kb
+from app.bot.keyboards.inline import today_kb
 def get_router(service):
     router = Router()
     @router.message(Command("today"))
