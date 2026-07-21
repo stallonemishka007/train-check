@@ -10,6 +10,13 @@ from app.bot.handlers.workout import get_router as workout_router
 async def init_db(pool):
     async with pool.acquire() as conn:
         await conn.execute("""
+        DROP TABLE IF EXISTS sets CASCADE;
+        DROP TABLE IF EXISTS workout_exercises CASCADE;
+        DROP TABLE IF EXISTS workouts CASCADE;
+        DROP TABLE IF EXISTS exercises CASCADE;
+        DROP TABLE IF EXISTS users CASCADE;
+        """)
+        await conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id BIGINT PRIMARY KEY
         );
