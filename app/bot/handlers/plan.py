@@ -7,7 +7,7 @@ from app.bot.keyboards.inline import plan_kb
 async def handle_start(callback: CallbackQuery, state: FSMContext, service):
     await service.ensure_user(callback.from_user.id)
     await callback.message.edit_text(
-        "Выбери план тренировок:",
+        "ВЫБОР ПЛАНА ✅",
         reply_markup=plan_kb()
     )
 
