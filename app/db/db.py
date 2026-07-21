@@ -1,7 +1,6 @@
 import os
 import asyncpg
 async def create_pool():
-    return await asyncpg.create_pool(
-        user=os.getenv("PGUSER"),
-        dsn=os.getenv("DATABASE_URL")
-    )
+    dsn = os.getenv("DATABASE_URL")
+    print("DATABASE_URL:", dsn)  # временно для дебага
+    return await asyncpg.create_pool(dsn=dsn)
