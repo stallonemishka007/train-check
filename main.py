@@ -35,6 +35,11 @@ async def init_db(pool):
             reps INT
         );
         """)
+        # фикс старой схемы
+        await conn.execute("""
+        ALTER TABLE workouts
+        ADD COLUMN IF NOT EXISTS user_id BIGINT;
+        """)
         await conn.execute("""
         INSERT INTO exercises (id, name)
         VALUES (1, 'Жим лёжа'), (2, 'Присед')
@@ -45,6 +50,7 @@ async def main():
     dp = Dispatcher()
     # ✅ подключение к БД
     pool = await create_pool()
+    await init_db(pool)
     repo = WorkoutRepo(pool)
     service = WorkoutService(repo)
     # ✅ подключение роутеров
