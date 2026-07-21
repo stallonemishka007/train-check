@@ -10,6 +10,12 @@ from app.bot.handlers.workout import get_router as workout_router
 async def init_db(pool):
     async with pool.acquire() as conn:
         await conn.execute("""
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS plan TEXT;
+        """)
+        await conn.execute("""
+        UPDATE users SET plan='full' WHERE plan IS NULL;
+        """)
+        await conn.execute("""
         DROP TABLE IF EXISTS sets CASCADE;
         DROP TABLE IF EXISTS workout_exercises CASCADE;
         DROP TABLE IF EXISTS workouts CASCADE;
@@ -66,7 +72,6 @@ async def main():
 
     pool = await create_pool()
     await init_db(pool)
-
     repo = WorkoutRepo(pool)
     service = WorkoutService(repo)
 
