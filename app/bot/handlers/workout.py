@@ -11,8 +11,9 @@ def get_router(service):
     @router.callback_query(lambda c: c.data.startswith("plan:"))
     async def start_workout(callback: CallbackQuery, state: FSMContext):
         ex = await service.start_workout(callback.from_user.id)
-        await callback.message.edit_text(fmt(ex) + "\n\nВведи 80x8",
-                                         reply_markup=exercise_kb(ex["id"]))
+        await callback.message.edit_text(
+            f"{ex['name']}\n{ex['done']}/{ex['sets']}\n\nВведи 80x8"
+        )
         await state.set_state(WorkoutState.waiting_input)
         await callback.answer()
     @router.callback_query(lambda c: c.data.startswith("set:"))
