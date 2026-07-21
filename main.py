@@ -48,17 +48,20 @@ async def init_db(pool):
 async def main():
     bot = Bot(token=os.getenv("BOT_TOKEN"))
     dp = Dispatcher()
-    # ✅ подключение к БД
+
     pool = await create_pool()
     await init_db(pool)
+
     repo = WorkoutRepo(pool)
     service = WorkoutService(repo)
-    # ✅ подключение роутеров
+
     dp.include_router(start_router(service))
     dp.include_router(plan_router(service))
     dp.include_router(workout_router(service))
+
+    await bot.delete_webhook(drop_pending_updates=True)
     print("✅ Bot started")
-    await init_db(pool)
+    await dp.start_polling(bot)
 if __name__ == "__main__":
     try:
         asyncio.run(main())
