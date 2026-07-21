@@ -1,28 +1,27 @@
-import app.services.workout_service as ws
-print("LOADED FROM:", ws.__file__)
-
 import asyncio
-
+import os
 from aiogram import Bot, Dispatcher
-
-from app.bot.handlers.today import get_router as today_router
-from app.bot.handlers.workout import get_router as workout_router
-from app.core.config import settings
-from app.core.database import create_pool
-from app.db.repositories.workout_repo import WorkoutRepository
+from app.db.db import create_pool
+from app.repositories.workout_repo import WorkoutRepo
 from app.services.workout_service import WorkoutService
-
-
+from app.bot.handlers.start import get_router as start_router
+from app.bot.handlers.plan import get_router as plan_router
+from app.bot.handlers.workout import get_router as workout_router
 async def main():
-    bot = Bot(token=settings.BOT_TOKEN)
+    bot = Bot(token=os.getenv("BOT_TOKEN"))
     dp = Dispatcher()
-    pool = await create_pool(settings.DB_URL)
-    repo = WorkoutRepository(pool)
+    # ✅ подключение к БД
+    pool = await create_pool()
+    repo = WorkoutRepo(pool)
     service = WorkoutService(repo)
-    dp.include_router(today_router(service))
+    # ✅ подключение роутеров
+    dp.include_router(start_router(service))
+    dp.include_router(plan_router(service))
     dp.include_router(workout_router(service))
+    print("✅ Bot started")
     await dp.start_polling(bot)
-
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        print("❌ Bot stopped")
