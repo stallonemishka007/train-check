@@ -46,7 +46,10 @@ async def init_db(pool):
             reps INT
         );
         """)
-
+        await conn.execute("""
+        ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS plan TEXT;
+        """)
         # фикс старой схемы
         await conn.execute("""
         ALTER TABLE workouts

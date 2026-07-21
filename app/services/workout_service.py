@@ -10,10 +10,21 @@ class WorkoutService:
         return True
     async def start_workout(self, user_id: int):
         workout_id = await self.repo.create_workout(user_id)
-        exercises = [
-            {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0},
-            {"id": 2, "name": "Присед", "sets": 3, "done": 0}
-        ]
+        plan = await self.get_plan(user_id)
+        if plan == "full":
+            exercises = [
+                {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0},
+                {"id": 2, "name": "Присед", "sets": 3, "done": 0}
+            ]
+        elif plan == "split":
+            exercises = [
+                {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
+            ]
+        else:
+            # fallback
+            exercises = [
+                {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
+            ]
         db_ids = []
         for i, ex in enumerate(exercises):
             db_id = await self.repo.add_exercise(workout_id, ex["id"], i)
@@ -45,3 +56,7 @@ class WorkoutService:
             "done": ex["done"],
             "sets": ex["sets"]
         }
+    async def set_plan(self, user_id: int, plan: str):
+        await self.repo.set_plan(user_id, plan)
+    async def get_plan(self, user_id: int):
+        return await self.repo.get_plan(user_id)

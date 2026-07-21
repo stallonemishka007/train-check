@@ -35,3 +35,14 @@ class WorkoutRepo:
         """
         async with self.pool.acquire() as conn:
             await conn.execute(query, we_id, weight, reps)
+    async def set_plan(self, user_id: int, plan: str):
+        query = """
+        UPDATE users SET plan=$1 WHERE id=$2
+        """
+        async with self.pool.acquire() as conn:
+            await conn.execute(query, plan, user_id)
+    async def get_plan(self, user_id: int):
+        query = "SELECT plan FROM users WHERE id=$1"
+        async with self.pool.acquire() as conn:
+            row = await conn.fetchrow(query, user_id)
+            return row["plan"] if row else None
