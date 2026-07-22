@@ -1,3 +1,6 @@
+from datetime import datetime, time
+
+
 class WorkoutRepo:
     def __init__(self, pool):
         self.pool = pool
@@ -51,14 +54,26 @@ class WorkoutRepo:
         query = """
         UPDATE users SET schedule_days=$1, notify_time=$2 WHERE id=$3
         """
+        # ensure notify_time is a time object for asyncpg
+        nt = notify_time
+        if isinstance(notify_time, str):
+            try:
+                nt = datetime.strptime(notify_time, "%H:%M").time()
+            except Exception:
+                nt = None
         async with self.pool.acquire() as conn:
-            await conn.execute(query, days, notify_time, user_id)
+            await conn.execute(query, days, nt, user_id)
 
     async def get_scheduled_users(self):
-        query = "SELECT id, schedule_days, notify_time FROM users WHERE schedule_days IS NOT NULL"
+        query = "SELECT id, schedule_days, notify_time, last_notified FROM users WHERE schedule_days IS NOT NULL"
         async with self.pool.acquire() as conn:
             rows = await conn.fetch(query)
             return [dict(r) for r in rows]
+
+    async def set_last_notified(self, user_id: int, date_val):
+        query = "UPDATE users SET last_notified=$1 WHERE id=$2"
+        async with self.pool.acquire() as conn:
+            await conn.execute(query, date_val, user_id)
 
     async def get_schedule(self, user_id: int):
         query = "SELECT schedule_days, notify_time FROM users WHERE id=$1"

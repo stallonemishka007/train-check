@@ -30,7 +30,8 @@ async def init_db(pool):
             id BIGINT PRIMARY KEY,
             plan TEXT,
             schedule_days TEXT,
-            notify_time TIME
+            notify_time TIME,
+            last_notified DATE
         );
 
         CREATE TABLE IF NOT EXISTS workouts (
@@ -68,6 +69,18 @@ async def init_db(pool):
         await conn.execute("""
         ALTER TABLE users
         ADD COLUMN IF NOT EXISTS plan TEXT;
+        """)
+        await conn.execute("""
+        ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS schedule_days TEXT;
+        """)
+        await conn.execute("""
+        ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS notify_time TIME;
+        """)
+        await conn.execute("""
+        ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS last_notified DATE;
         """)
         # фикс старой схемы
         await conn.execute("""

@@ -44,6 +44,16 @@ def get_router(service):
             await callback.answer()
             return
         if action == "save":
+            s = service.schedule_edits.get(callback.from_user.id)
+            if not s:
+                await callback.answer()
+                return
+            # validate time before saving
+            if not service.validate_time(s.get("time", "")):
+                await callback.message.answer("Неверный формат времени. Введи HH:MM")
+                await state.set_state(ScheduleState.waiting_time_input)
+                await callback.answer()
+                return
             ok = await service.save_schedule_edit(callback.from_user.id)
             if ok:
                 await callback.message.edit_text("Расписание сохранено")

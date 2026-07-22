@@ -3,6 +3,16 @@ class WorkoutService:
         self.repo = repo
         self.sessions = {}
         self.schedule_edits = {}
+        
+    def validate_time(self, time_str: str) -> bool:
+        from datetime import datetime
+        if not isinstance(time_str, str):
+            return False
+        try:
+            datetime.strptime(time_str, "%H:%M")
+            return True
+        except Exception:
+            return False
     async def ensure_user(self, user_id: int):
         user = await self.repo.get_user(user_id)
         if not user:
@@ -121,6 +131,9 @@ class WorkoutService:
     async def save_schedule_edit(self, user_id: int):
         s = self.schedule_edits.get(user_id)
         if not s:
+            return False
+        # validate time format before saving
+        if not self.validate_time(s.get("time", "")):
             return False
         days = ",".join(s["days"])
         await self.set_schedule(user_id, days, s["time"])

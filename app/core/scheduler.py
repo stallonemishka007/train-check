@@ -21,19 +21,24 @@ async def scheduler(bot, repo):
                 uid = r.get('id')
                 days = r.get('schedule_days') or ""
                 notify_time = (r.get('notify_time') or "").strftime("%H:%M") if hasattr(r.get('notify_time'), 'strftime') else (r.get('notify_time') or "")
+                last_notified = r.get('last_notified')
                 # parse days like 'Mon,Wed,Fri'
                 days_list = [d.strip() for d in days.split(',') if d.strip()]
                 # check weekday
                 ok_day = any(weekdays_map.get(d, -1) == cur_wd for d in days_list)
                 if ok_day and notify_time == cur_time:
-                    # avoid double send within same day
-                    key = f"{uid}:{now.date()}"
-                    if last_sent.get(key):
-                        continue
+                    # check DB last_notified to avoid duplicates across restarts
                     try:
+                        if last_notified == now.date():
+                            continue
                         await bot.send_message(uid, "У тебя сегодня тренировка")
-                        last_sent[key] = True
+                        # persist last_notified as date
+                        try:
+                            await repo.set_last_notified(uid, now.date())
+                        except Exception:
+                            pass
                     except Exception:
+                        # network/send errors — ignore and continue
                         pass
         except Exception:
             pass
