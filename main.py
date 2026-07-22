@@ -7,6 +7,9 @@ from app.services.workout_service import WorkoutService
 from app.bot.handlers.start import get_router as start_router
 from app.bot.handlers.plan import get_router as plan_router
 from app.bot.handlers.workout import get_router as workout_router
+from app.bot.handlers.schedule import get_router as schedule_router
+from app.core.scheduler import scheduler as background_scheduler
+from app.bot.handlers.stats import get_router as stats_router
 async def init_db(pool):
     async with pool.acquire() as conn:
         await conn.execute("""
@@ -24,7 +27,10 @@ async def init_db(pool):
         """)
         await conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id BIGINT PRIMARY KEY
+            id BIGINT PRIMARY KEY,
+            plan TEXT,
+            schedule_days TEXT,
+            notify_time TIME
         );
 
         CREATE TABLE IF NOT EXISTS workouts (
@@ -50,6 +56,13 @@ async def init_db(pool):
             workout_exercise_id INT,
             weight FLOAT,
             reps INT
+        );
+        
+        CREATE TABLE IF NOT EXISTS user_exercise_meta (
+            user_id BIGINT,
+            exercise_id INT,
+            last_weight FLOAT,
+            PRIMARY KEY (user_id, exercise_id)
         );
         """)
         await conn.execute("""
@@ -78,6 +91,11 @@ async def main():
     dp.include_router(start_router(service))
     dp.include_router(plan_router(service))
     dp.include_router(workout_router(service))
+    dp.include_router(schedule_router(service))
+    dp.include_router(stats_router(service))
+
+    # запустить планировщик уведомлений
+    asyncio.create_task(background_scheduler(bot, repo))
 
     await bot.delete_webhook(drop_pending_updates=True)
     print("✅ Bot started")
