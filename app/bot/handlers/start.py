@@ -6,5 +6,5 @@ def get_router(service):
     router = Router()
     @router.message(Command("start"))
     async def start(message: Message):
-        await message.answer("Будем тренить?", reply_markup=start_kb())
+        await message.answer("Будем тренить сегодня?", reply_markup=start_kb())
     return router
