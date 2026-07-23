@@ -148,3 +148,33 @@ class WorkoutRepo:
         async with self.pool.acquire() as conn:
             row = await conn.fetchrow(query, user_id)
             return dict(row) if row else {"workouts_count": 0, "sets_count": 0, "avg_weight": None}
+
+    # Plan exercises management
+    async def add_exercise_to_plan(self, user_id: int, plan_name: str, exercise_id: int, order_index: int):
+        query = """
+        INSERT INTO plan_exercises (user_id, plan_name, exercise_id, order_index)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT DO NOTHING
+        """
+        async with self.pool.acquire() as conn:
+            await conn.execute(query, user_id, plan_name, exercise_id, order_index)
+
+    async def remove_exercise_from_plan(self, user_id: int, plan_name: str, exercise_id: int):
+        query = """
+        DELETE FROM plan_exercises
+        WHERE user_id=$1 AND plan_name=$2 AND exercise_id=$3
+        """
+        async with self.pool.acquire() as conn:
+            await conn.execute(query, user_id, plan_name, exercise_id)
+
+    async def get_plan_exercises(self, user_id: int, plan_name: str):
+        query = """
+        SELECT pe.id, ce.id as exercise_id, ce.name, ce.default_weight, ce.default_reps, ce.default_sets
+        FROM plan_exercises pe
+        JOIN custom_exercises ce ON ce.id = pe.exercise_id
+        WHERE pe.user_id=$1 AND pe.plan_name=$2
+        ORDER BY pe.order_index
+        """
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(query, user_id, plan_name)
+            return [dict(r) for r in rows]

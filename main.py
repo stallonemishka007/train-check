@@ -77,6 +77,15 @@ async def init_db(pool):
             default_sets INT,
             created_at TIMESTAMP DEFAULT NOW()
         );
+
+        CREATE TABLE IF NOT EXISTS plan_exercises (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT,
+            plan_name TEXT,
+            exercise_id INT,
+            order_index INT,
+            FOREIGN KEY (exercise_id) REFERENCES custom_exercises(id) ON DELETE CASCADE
+        );
         """)
         await conn.execute("""
         ALTER TABLE users

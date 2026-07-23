@@ -32,11 +32,39 @@ class WorkoutService:
             exercises = [
                 {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
             ]
+        elif plan == "custom":
+            # load custom exercises
+            custom_exs = await self.get_custom_exercises(user_id)
+            exercises = []
+            for ex in custom_exs:
+                exercises.append({
+                    "id": ex["id"],
+                    "name": ex["name"],
+                    "sets": ex["default_sets"],
+                    "done": 0
+                })
+            if not exercises:
+                # fallback if no custom exercises
+                exercises = [
+                    {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
+                ]
         else:
-            # fallback
-            exercises = [
-                {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
-            ]
+            # check if it's a plan with custom exercises
+            plan_exs = await self.repo.get_plan_exercises(user_id, plan)
+            if plan_exs:
+                exercises = []
+                for ex in plan_exs:
+                    exercises.append({
+                        "id": ex["exercise_id"],
+                        "name": ex["name"],
+                        "sets": ex["default_sets"],
+                        "done": 0
+                    })
+            else:
+                # fallback
+                exercises = [
+                    {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
+                ]
         db_ids = []
         for i, ex in enumerate(exercises):
             db_id = await self.repo.add_exercise(workout_id, ex["id"], i)
@@ -156,3 +184,13 @@ class WorkoutService:
 
     async def delete_custom_exercise(self, user_id: int, exercise_id: int):
         await self.repo.delete_custom_exercise(user_id, exercise_id)
+
+    # plan exercises
+    async def add_exercise_to_plan(self, user_id: int, plan_name: str, exercise_id: int, order_index: int):
+        await self.repo.add_exercise_to_plan(user_id, plan_name, exercise_id, order_index)
+
+    async def remove_exercise_from_plan(self, user_id: int, plan_name: str, exercise_id: int):
+        await self.repo.remove_exercise_from_plan(user_id, plan_name, exercise_id)
+
+    async def get_plan_exercises(self, user_id: int, plan_name: str):
+        return await self.repo.get_plan_exercises(user_id, plan_name)

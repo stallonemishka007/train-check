@@ -7,7 +7,10 @@ def start_kb():
 def plan_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💪 Фулбоди", callback_data="plan:full")],
-        [InlineKeyboardButton(text="🏋️ Верх/Низ", callback_data="plan:split")]
+        [InlineKeyboardButton(text="⚙️ Редактировать Фулбоди", callback_data="edit_plan:full")],
+        [InlineKeyboardButton(text="🏋️ Верх/Низ", callback_data="plan:split")],
+        [InlineKeyboardButton(text="⚙️ Редактировать Верх/Низ", callback_data="edit_plan:split")],
+        [InlineKeyboardButton(text="📋 Мои упражнения", callback_data="plan:custom")]
     ])
 def exercise_kb(ex_id: int):
     return InlineKeyboardMarkup(inline_keyboard=[

@@ -7,5 +7,5 @@ def get_router(service):
     @router.message(Command("start"))
     async def start(message: Message):
         await service.ensure_user(message.from_user.id)
-        await message.answer("Главное меню", reply_markup=main_menu_kb())
+        await message.answer("👋 Добро пожаловать! Нажмите /start для начала тренировки\n\nГлавное меню", reply_markup=main_menu_kb())
     return router
