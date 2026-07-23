@@ -23,48 +23,35 @@ class WorkoutService:
         workout_id = await self.repo.create_workout(user_id)
         plan = await self.get_plan(user_id)
         print("USER PLAN:", plan)
-        if plan == "full":
-            exercises = [
-                {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0},
-                {"id": 2, "name": "Присед", "sets": 3, "done": 0}
-            ]
-        elif plan == "split":
-            exercises = [
-                {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
-            ]
-        elif plan == "custom":
-            # load custom exercises
+
+        if plan == "custom":
+            # load all custom exercises for a fully custom plan
             custom_exs = await self.get_custom_exercises(user_id)
-            exercises = []
-            for ex in custom_exs:
-                exercises.append({
-                    "id": ex["id"],
-                    "name": ex["name"],
-                    "sets": ex["default_sets"],
-                    "done": 0
-                })
+            exercises = [
+                {"id": ex["id"], "name": ex["name"], "sets": ex["default_sets"], "done": 0}
+                for ex in custom_exs
+            ]
             if not exercises:
-                # fallback if no custom exercises
-                exercises = [
-                    {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
-                ]
+                exercises = [{"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}]
         else:
-            # check if it's a plan with custom exercises
             plan_exs = await self.repo.get_plan_exercises(user_id, plan)
             if plan_exs:
-                exercises = []
-                for ex in plan_exs:
-                    exercises.append({
-                        "id": ex["exercise_id"],
-                        "name": ex["name"],
-                        "sets": ex["default_sets"],
-                        "done": 0
-                    })
-            else:
-                # fallback
+                exercises = [
+                    {"id": ex["exercise_id"], "name": ex["name"], "sets": ex["default_sets"], "done": 0}
+                    for ex in plan_exs
+                ]
+            elif plan == "full":
+                exercises = [
+                    {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0},
+                    {"id": 2, "name": "Присед", "sets": 3, "done": 0}
+                ]
+            elif plan == "split":
                 exercises = [
                     {"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}
                 ]
+            else:
+                exercises = [{"id": 1, "name": "Жим лёжа", "sets": 4, "done": 0}]
+
         db_ids = []
         for i, ex in enumerate(exercises):
             db_id = await self.repo.add_exercise(workout_id, ex["id"], i)
