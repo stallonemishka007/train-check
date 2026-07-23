@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 from app.bot.states.workout import WorkoutState
 from app.bot.keyboards.inline import session_kb
+from app.utils.telegram import safe_edit_text
 
 
 def get_router(service):
@@ -17,7 +18,7 @@ def get_router(service):
         await service.set_plan(callback.from_user.id, plan)
         ex = await service.start_workout(callback.from_user.id)
         # установить состояние ожидания и показать кнопки
-        await callback.message.edit_text(fmt(ex, service.sessions[callback.from_user.id]["current_weight"]), reply_markup=session_kb(service.sessions[callback.from_user.id]["current_weight"]))
+        await safe_edit_text(callback, fmt(ex, service.sessions[callback.from_user.id]["current_weight"]), reply_markup=session_kb(service.sessions[callback.from_user.id]["current_weight"]))
         await state.set_state(WorkoutState.waiting_input)
         await callback.answer()
 
@@ -40,12 +41,12 @@ def get_router(service):
         weight = s["current_weight"]
         result = await service.add_set(callback.from_user.id, weight, reps)
         if result.get("status") == "finished":
-            await callback.message.edit_text("Тренировка завершена ✅")
+            await safe_edit_text(callback, "Тренировка завершена ✅")
             await state.clear()
             await callback.answer()
             return
         # иначе обновляем сообщение на следующий сет/упражнение
-        await callback.message.edit_text(fmt(result, s["current_weight"]), reply_markup=session_kb(s["current_weight"]))
+        await safe_edit_text(callback, fmt(result, s["current_weight"]), reply_markup=session_kb(s["current_weight"]))
         await callback.answer()
 
     @router.callback_query(lambda c: c.data == "skip")
@@ -58,12 +59,12 @@ def get_router(service):
         s["exercises"][s["current"]]["done"] = s["exercises"][s["current"]]["sets"]
         s["current"] += 1
         if s["current"] >= len(s["exercises"]):
-            await callback.message.edit_text("Тренировка завершена ✅")
+            await safe_edit_text(callback, "Тренировка завершена ✅")
             await state.clear()
             await callback.answer()
             return
         ex = service._current(callback.from_user.id)
-        await callback.message.edit_text(fmt(ex, s["current_weight"]), reply_markup=session_kb(s["current_weight"]))
+        await safe_edit_text(callback, fmt(ex, s["current_weight"]), reply_markup=session_kb(s["current_weight"]))
         await callback.answer()
 
     @router.callback_query(lambda c: c.data.startswith("weight:"))
@@ -85,7 +86,7 @@ def get_router(service):
             return
         s["current_weight"] = max(0, s["current_weight"] + delta)
         ex = service._current(callback.from_user.id)
-        await callback.message.edit_text(fmt(ex, s["current_weight"]), reply_markup=session_kb(s["current_weight"]))
+        await safe_edit_text(callback, fmt(ex, s["current_weight"]), reply_markup=session_kb(s["current_weight"]))
         await callback.answer()
 
     @router.message(WorkoutState.waiting_custom_weight)

@@ -50,3 +50,21 @@ def schedule_kb(selected_days: list = None, current_time: str = "17:00"):
     rows.append([InlineKeyboardButton(text=f"Время: {current_time}", callback_data="sched:time")])
     rows.append([InlineKeyboardButton(text="Сохранить", callback_data="sched:save")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def main_menu_kb():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🚀 Старт", callback_data="start")],
+        [InlineKeyboardButton(text="📋 История", callback_data="history_btn")],
+        [InlineKeyboardButton(text="📊 Статистика", callback_data="stats_btn")],
+        [InlineKeyboardButton(text="⚙️ Расписание", callback_data="schedule")],
+        [InlineKeyboardButton(text="💪 Мои упражнения", callback_data="manage_exercises")]
+    ])
+
+
+def manage_exercises_kb():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="➕ Добавить упражнение", callback_data="add_exercise")],
+        [InlineKeyboardButton(text="📝 Мои упражнения", callback_data="list_exercises")],
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data="menu")]
+    ])

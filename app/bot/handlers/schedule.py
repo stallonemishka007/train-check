@@ -3,6 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 from app.bot.keyboards.inline import schedule_kb
 from app.bot.states.workout import ScheduleState
+from app.utils.telegram import safe_edit_text
 
 
 def get_router(service):
@@ -25,7 +26,7 @@ def get_router(service):
             days_list = ["Mon", "Wed", "Fri"]
             time = "17:00"
         service.start_schedule_edit(callback.from_user.id, {"days": days_list, "time": time})
-        await callback.message.edit_text("Настройки расписания", reply_markup=schedule_kb(days_list, time))
+        await safe_edit_text(callback, "Настройки расписания", reply_markup=schedule_kb(days_list, time))
         await callback.answer()
 
     @router.callback_query(lambda c: c.data.startswith("sched:"))
@@ -35,7 +36,7 @@ def get_router(service):
         if action == "toggle":
             day = parts[2]
             s = service.toggle_edit_day(callback.from_user.id, day)
-            await callback.message.edit_text("Настройки расписания", reply_markup=schedule_kb(s.get("days"), s.get("time")))
+            await safe_edit_text(callback, "Настройки расписания", reply_markup=schedule_kb(s.get("days"), s.get("time")))
             await callback.answer()
             return
         if action == "time":
@@ -56,9 +57,9 @@ def get_router(service):
                 return
             ok = await service.save_schedule_edit(callback.from_user.id)
             if ok:
-                await callback.message.edit_text("Расписание сохранено")
+                await safe_edit_text(callback, "Расписание сохранено")
             else:
-                await callback.message.edit_text("Не удалось сохранить расписание")
+                await safe_edit_text(callback, "Не удалось сохранить расписание")
             await callback.answer()
             return
         await callback.answer()

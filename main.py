@@ -10,6 +10,8 @@ from app.bot.handlers.workout import get_router as workout_router
 from app.bot.handlers.schedule import get_router as schedule_router
 from app.core.scheduler import scheduler as background_scheduler
 from app.bot.handlers.stats import get_router as stats_router
+from app.bot.handlers.menu import get_router as menu_router
+from app.bot.handlers.exercises import get_router as exercises_router
 async def init_db(pool):
     async with pool.acquire() as conn:
         await conn.execute("""
@@ -65,6 +67,16 @@ async def init_db(pool):
             last_weight FLOAT,
             PRIMARY KEY (user_id, exercise_id)
         );
+
+        CREATE TABLE IF NOT EXISTS custom_exercises (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT,
+            name TEXT,
+            default_weight FLOAT,
+            default_reps INT,
+            default_sets INT,
+            created_at TIMESTAMP DEFAULT NOW()
+        );
         """)
         await conn.execute("""
         ALTER TABLE users
@@ -106,6 +118,8 @@ async def main():
     dp.include_router(workout_router(service))
     dp.include_router(schedule_router(service))
     dp.include_router(stats_router(service))
+    dp.include_router(menu_router(service))
+    dp.include_router(exercises_router(service))
 
     # запустить планировщик уведомлений
     asyncio.create_task(background_scheduler(bot, repo))

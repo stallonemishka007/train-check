@@ -75,6 +75,27 @@ class WorkoutRepo:
         async with self.pool.acquire() as conn:
             await conn.execute(query, date_val, user_id)
 
+    # Custom exercises
+    async def add_custom_exercise(self, user_id: int, name: str, default_weight: float, default_reps: int, default_sets: int):
+        query = """
+        INSERT INTO custom_exercises (user_id, name, default_weight, default_reps, default_sets)
+        VALUES ($1, $2, $3, $4, $5) RETURNING id
+        """
+        async with self.pool.acquire() as conn:
+            row = await conn.fetchrow(query, user_id, name, default_weight, default_reps, default_sets)
+            return row["id"] if row else None
+
+    async def get_custom_exercises(self, user_id: int):
+        query = "SELECT id, name, default_weight, default_reps, default_sets FROM custom_exercises WHERE user_id=$1"
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch(query, user_id)
+            return [dict(r) for r in rows]
+
+    async def delete_custom_exercise(self, user_id: int, exercise_id: int):
+        query = "DELETE FROM custom_exercises WHERE user_id=$1 AND id=$2"
+        async with self.pool.acquire() as conn:
+            await conn.execute(query, user_id, exercise_id)
+
     async def get_schedule(self, user_id: int):
         query = "SELECT schedule_days, notify_time FROM users WHERE id=$1"
         async with self.pool.acquire() as conn:

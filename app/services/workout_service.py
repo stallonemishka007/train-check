@@ -146,3 +146,13 @@ class WorkoutService:
 
     async def get_stats(self, user_id: int):
         return await self.repo.get_user_stats(user_id)
+
+    # custom exercises
+    async def add_custom_exercise(self, user_id: int, name: str, weight: float, reps: int, sets: int):
+        return await self.repo.add_custom_exercise(user_id, name, weight, reps, sets)
+
+    async def get_custom_exercises(self, user_id: int):
+        return await self.repo.get_custom_exercises(user_id)
+
+    async def delete_custom_exercise(self, user_id: int, exercise_id: int):
+        await self.repo.delete_custom_exercise(user_id, exercise_id)
